@@ -44,12 +44,17 @@ var Api = function() {
 
                 http.request(url, opts, function(err, result) {
                     if (result) {
-                        log.d(URL.format({
-                            protocol: api.API_BASE_URL.substr(0, api.API_BASE_URL.indexOf(':')),
-                            host: api.API_BASE_URL.substr(api.API_BASE_URL.indexOf(':') + 3),
-                            pathname: uri,
-                            query: opts.args
-                        }));
+                        var fullUrl = api.API_BASE_URL + uri;
+                        if (opts.args) {
+                            fullUrl += "?";
+                            var firstArg = true;
+                            for (var key in opts.args) {
+                                if (!firstArg) fullUrl += "&";
+                                fullUrl += key + "=" + escape(opts.args[key]);
+                                firstArg = false;
+                            }
+                        }
+                        log.d(fullUrl);
 
                         log.d("HTTP status code: " + result.statuscode);
 

@@ -158,7 +158,6 @@ exports.landingPage = function(page) {
 
     // separators
     var firstSeparator = null;
-    // FIXME adding more entries seems to break movian's navigation...
     /*if (auth.isAuthenticated()) {
         var separatorMoviesRecommended = page.appendPassiveItem('separator', null, {
             title: 'Movies - Recommended'
@@ -732,8 +731,6 @@ exports.movie = function(page, id, config) {
         title: 'Similar',
         icon: Plugin.path + "views/img/movie.png"
     });
-
-    // TODO include movie stats?
 };
 
 exports.movie.similar = function(page, id) {

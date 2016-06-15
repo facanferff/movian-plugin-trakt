@@ -17,15 +17,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 This program is also available under a commercial proprietary license.
 */
 
-var itemhook = require('movian/itemhook');
-var http = require('movian/http');
-var itemhook = require('movian/itemhook');
-var page = require('movian/page');
-var popup = require('movian/popup');
-var prop = require('movian/prop');
-var service = require('movian/service');
-var settings = require('movian/settings');
-var URL = require('url');
+var http = require('showtime/http');
+var itemhook = require('showtime/itemhook');
+var page = require('showtime/page');
+var prop = require('showtime/prop');
+var service = require('showtime/service');
+var settings = require('showtime/settings');
 
 var api = require('./src/api');
 var auth = require('./src/auth');
@@ -34,6 +31,7 @@ var lookup = require('./src/lookup');
 var itemhooks = require('./src/itemhooks');
 var model = require('./src/model');
 var plugin = require('./src/plugin');
+var popup = require('./src/popup');
 var scrobble = require('./src/scrobble');
 var utils = require('./src/utils');
 var view = require('./src/view');

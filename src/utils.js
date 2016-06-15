@@ -128,7 +128,6 @@ exports.toImageSet = function(items, type, useDefault) {
                 height: imageDimensions[type].full.height,
                 url: Plugin.path + "views/img/" + type + "_default.png"
             }];
-            log.d(images);
         } else return null;
     }
     return "imageset:" + JSON.stringify(images);

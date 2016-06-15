@@ -24,6 +24,7 @@
   				height: 3em;
   	    	source: ICON;
           color: "#0F0F0F";
+          alpha: 0.5 + 0.5 * (isHovered() + isNavFocused() + isPressed());
   	  	});
 
   			widget(label, {
