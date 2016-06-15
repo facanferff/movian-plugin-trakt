@@ -1,0 +1,95 @@
+#import "common.view"
+
+widget(container_y, {
+	widget(container_y, {
+		padding: 1em;
+
+		#include "media_header.view"
+
+		widget(dummy, {
+			height: 0.1em;
+		});
+
+		widget(container_x, {
+			widget(container_y, {
+				widget(container_x, {
+					widget(container_y, {
+						.width = $ui.width * 0.25;
+
+						POSTER($self.model.metadata.poster);
+					});
+
+					widget(container_y, {
+						padding: [1em, 3.5em, 1em, 1em];
+						.width = $ui.width * 0.45;
+
+						spacing: 0.5em;
+
+						#include "media_ratings.view"
+
+						//LABEL("Awards:", $self.model.metadata.awards);
+						LABEL("Network:", $self.model.metadata.network);
+						LABEL("Released:", $self.model.metadata.released);
+						LABEL("Aired Episodes:", $self.model.metadata.airedEpisodes);
+						LABEL("Runtime (episode):", $self.model.metadata.runtime);
+						LABEL("Genre:", $self.model.metadata.genre);
+						//LABEL("Certification:", $self.model.metadata.certification);
+						/*LABEL("Status:", translate($self.model.metadata.status, "Unknown",
+																		"returning series", "Continuing",
+																		"in production", "In production",
+																		"planned", "Planned",
+																		"cancelled", "Cancelled",
+																		"ended", "Ended"));*/
+					});
+				});
+
+				widget(container_y, {
+					TEXT($self.model.metadata.description, justified);
+				});
+
+				widget(dummy, {
+					height: 1em;
+				});
+			});
+
+			// others
+			widget(container_y, {
+				height: $ui.height;
+				padding: [0, -2em, 0, 0];
+
+				IMAGE_ITEM($self.model.metadata.nextEpisode.title, $self.model.metadata.nextEpisode.subtitle,
+					$self.model.metadata.nextEpisode.screenshot, navOpen($self.model.metadata.nextEpisode.url),
+					!($self.model.metadata.nextEpisode.title), 1.0);
+
+				widget(dummy, {
+					height: 1em;
+					hidden: !($self.model.metadata.nextEpisode.title);
+				});
+
+				widget(list_x, {
+		      id: "seasons";
+					height: 8em;
+					spacing: 1em;
+
+					cloner($self.model.metadata.seasons, container_z, {
+						IMAGE_ITEM($self.title, $self.subtitle, $self.poster, navOpen($self.url), false, 0.9);
+					});
+				});
+
+				//LIST_X_SLIDER("seasons", true);
+
+				widget(dummy, {
+					height: 1em;
+				});
+
+				cloner($self.model.nodes, container_z, {
+					ACTION_ROW($self.metadata.title,
+						select($self.metadata.icon, $self.metadata.icon, "img/pencil.png"),
+						translate($self.type, navOpen($self.url),
+											"action", deliverEvent($self.eventSink)),
+						false);
+				});
+			});
+		});
+	});
+});

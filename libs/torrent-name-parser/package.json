@@ -1,0 +1,26 @@
+{
+  "name": "torrent-name-parser",
+  "version": "0.6.1",
+  "description": "Parses torrent name of a movie or TV show.",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/clems6ever/torrent-name-parser.git"
+  },
+  "homepage": "https://github.com/clems6ever/torrent-name-parser",
+  "bugs": {
+    "url": "https://github.com/clems6ever/torrent-name-parser/issues"
+  },
+  "keywords": [
+    "torrent",
+    "parser",
+    "torrent name parser",
+    "parse torrent name"
+  ],
+  "devDependencies": {
+    "tape": "^3.0.1",
+    "tap-spec": "^1.0.1"
+  },
+  "scripts": {
+    "test": "tape test.js | tap-spec"
+  }
+}

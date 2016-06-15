@@ -1,0 +1,10 @@
+widget(container_x, {
+  LOGO($self.model.metadata.logo, 4.5em, !($self.model.metadata.logo));
+
+  // show title if there is no logo available
+  TITLE($self.model.metadata.title, !(!$self.model.metadata.logo));
+
+  CERTIFICATION($self.model.metadata.certification, !($self.model.metadata.certification));
+
+  STATUS($self.model.metadata.status, !($self.model.metadata.status));
+});

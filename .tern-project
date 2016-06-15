@@ -1,0 +1,12 @@
+{
+  "ecmaVersion": 6,
+  "libs": [],
+  "plugins" : {
+    "lint": {
+      "load": true
+    },
+    "node": {
+      "load": true
+    }
+  }
+}

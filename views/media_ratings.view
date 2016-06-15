@@ -1,0 +1,27 @@
+widget(container_x, {
+  height: 4em;
+  spacing: 1em;
+  hidden: !($self.model.metadata.numberAwardsWins ||
+            $self.model.metadata.numberAwardsNominations ||
+            $self.model.metadata.rt.images ||
+            $self.model.metadata.metacritic ||
+            $self.model.metadata.trakt.rating);
+
+  padding: [0, -2em, 0, 0];
+
+  RATING("img/trophy.png", $self.model.metadata.numberAwardsWins);
+
+  RATING("img/silver_medal.png", $self.model.metadata.numberAwardsNominations);
+
+  RATING(translate($self.model.metadata.rt.image, "img/rt_fresh.png",
+                  "certified", "img/rt_certified.png",
+                  "fresh", "img/rt_fresh.png",
+                  "rotten", "img/rt_rotten.png"),
+         $self.model.metadata.rt.criticsMeter);
+
+  RATING("img/metacritic.png", $self.model.metadata.metacritic);
+
+  RATING("img/trakt.png", $self.model.metadata.trakt.rating);
+
+  RATING("img/play.png", $self.model.metadata.plays);
+});

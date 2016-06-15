@@ -1,0 +1,36 @@
+widget(container_x, {
+	focusable: true;
+
+	widget(container_z) {
+		widget(quad, {
+	    fhpSpill: true;
+	    additive: true;
+			width: $ui.size * 15;
+			height: $ui.size * 3;
+	    alpha: 0.3 + 0.1 * isHovered() + 0.15 * iir(isNavFocused(), 4, true);
+	  });
+
+		widget(container_x, {
+			padding: [0.5em, 0.5em];
+			spacing: 0.2em;
+
+		  widget(image, {
+	    	margin: [0.1em, 0.1em];
+				height: $ui.size * 3;
+	    	source: $self.metadata.icon;
+	  	});
+
+			widget(label, {
+			  caption: $self.metadata.title;
+				padding: [0.5em, 0];
+	  		align: center;
+			});
+		});
+	});
+
+	onEvent(activate,
+		translate($self.type, void,
+		"pageevent", deliverEvent($page.eventSink, $self.data),
+		"navopen", navOpen($self.data)
+	));
+});

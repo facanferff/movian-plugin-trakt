@@ -1,0 +1,14 @@
+{
+	"author": "Fábio Ferreira",
+	"title": "Trakt",
+	"synopsis": "Track TV & movies",
+	"description": "Track TV & movies",
+	"version": "0.9",
+	"file": "trakt.js",
+	"showtimeVersion": "5.0.241",
+	"type": "ecmascript",
+	"id": "trakt",
+	"icon": "logo.png",
+	"category": "other",
+	"apiversion": 2
+}
