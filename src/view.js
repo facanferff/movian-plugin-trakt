@@ -568,6 +568,15 @@ exports.movie = function(page, id, config) {
             }).moveBefore(itemSimilar);
         }
 
+        if (data.trailer) {
+            if (data.trailer)
+                data.trailer = data.trailer.replace("youtube.com", "www.youtube.com");
+            var itemTrailer = page.appendItem(data.trailer, 'video', {
+                title: 'Trailer',
+                icon: Plugin.path + "views/img/play.png"
+            });
+        }
+
         page.appendItem("search:" + page.metadata.title, 'directory', {
             title: 'Search',
             icon: Plugin.path + "views/img/search.png"
