@@ -1,0 +1,51 @@
+#import "common.view"
+
+$self.model.metadata.background = $self.model.metadata.background_portrait;
+
+widget(list_y, {
+	widget(container_y, {
+		widget(container_y, {
+			padding: 1em;
+
+			#include "media_header.view"
+
+			widget(container_y, {
+				widget(container_y, {
+
+					widget(container_y, {
+						padding: [1em, 3em, 1em, 1em];
+
+						spacing: 0.5em;
+
+						#include "media_ratings.view"
+
+						LABEL("Director:", $self.model.metadata.director);
+						LABEL("Runtime:", $self.model.metadata.runtime);
+						LABEL("First Aired:", $self.model.metadata.firstAired);
+						LABEL("Rated:", $self.model.metadata.rated);
+						LABEL("Last Seen Date:", $self.model.metadata.lastSeen);
+
+						TEXT_NO_SLIDER($self.model.metadata.description, justified);
+					});
+
+					widget(dummy, {
+						height: 1em;
+					});
+				});
+
+				// others
+				widget(container_y, {
+					height: $ui.height;
+
+					cloner($self.model.nodes, container_z, {
+						ACTION_ROW($self.metadata.title,
+							select($self.metadata.icon, $self.metadata.icon, "img/pencil.png"),
+							translate($self.type, navOpen($self.url),
+												"action", deliverEvent($self.eventSink)),
+							false);
+					});
+				});
+			});
+		});
+	});
+});

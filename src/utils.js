@@ -76,7 +76,7 @@ var imageDimensions = {
  * Exported Functions
  ******************************************************************************/
 
-exports.formatNumber = function(num, numDigits) {
+exports.formatNumber = function (num, numDigits) {
     var output = num + '';
     while (output.length < numDigits) {
         output = '0' + output;
@@ -84,7 +84,7 @@ exports.formatNumber = function(num, numDigits) {
     return output;
 };
 
-exports.sortByField = function(arr, field, asc) {
+exports.sortByField = function (arr, field, asc) {
     function compare(a, b) {
         if (a[field] !== b[field])
             return (a[field] < b[field] ? -1 : 1) * (asc ? 1 : -1);
@@ -94,7 +94,7 @@ exports.sortByField = function(arr, field, asc) {
     arr.sort(compare);
 };
 
-exports.getChild = function(arr, field, value) {
+exports.getChild = function (arr, field, value) {
     for (var i in arr) {
         var item = arr[i];
         if (item[field] === value)
@@ -104,11 +104,11 @@ exports.getChild = function(arr, field, value) {
     return null;
 };
 
-exports.prettyStatus = function(status) {
+exports.prettyStatus = function (status) {
     return status.capitalize(status);
 };
 
-exports.toImageSet = function(items, type, useDefault) {
+exports.toImageSet = function (items, type, useDefault) {
     if (useDefault === null || useDefault === undefined) useDefault = true;
 
     var images = [];
@@ -133,8 +133,16 @@ exports.toImageSet = function(items, type, useDefault) {
     return "imageset:" + JSON.stringify(images);
 };
 
-String.prototype.capitalize = function(lower) {
-    return (lower ? this.toLowerCase() : this).replace(/(?:^|\s)\S/g, function(a) {
+exports.appendImageSet = function (imageset1, imageset2) {
+    var arr1 = JSON.parse(imageset1.substr(9));
+    var arr2 = JSON.parse(imageset2.substr(9));
+    for (var i in arr2)
+        arr1.push(arr2[i]);
+    return "imageset:" + JSON.stringify(arr1);
+}
+
+String.prototype.capitalize = function (lower) {
+    return (lower ? this.toLowerCase() : this).replace(/(?:^|\s)\S/g, function (a) {
         return a.toUpperCase();
     });
 };

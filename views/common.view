@@ -8,7 +8,6 @@
   		widget(quad, {
   	    fhpSpill: true;
   	    additive: true;
-  			width: 15em;
   			height: 3em;
         //color: $view.posterPrimaryColor;
         color: "#212121";
@@ -25,6 +24,7 @@
   	    	source: ICON;
           color: "#0F0F0F";
           alpha: 0.5 + 0.5 * (isHovered() + isNavFocused() + isPressed());
+          hidden: !(ICON);
   	  	});
 
   			widget(label, {
@@ -170,6 +170,19 @@
     });
 
     LIST_Y_SLIDER("bodytext", true);
+  });
+}
+
+#define TEXT_NO_SLIDER(CONTENT, ALIGN) {
+  widget(container_x, {
+      widget(label, {
+        TextStyleItem();
+        caption: CONTENT;
+        maxlines: 50;
+        align: ALIGN;
+        bold: false;
+        sizeScale: 1.2;
+      });
   });
 }
 

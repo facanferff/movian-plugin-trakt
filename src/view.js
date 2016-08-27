@@ -63,7 +63,7 @@ function templateList(page, model, config) {
     var pageNum = config.pageNum ? config.pageNum : 1;
     var numberItemsPerPage = config.numberItems ? config.numberItems : 10;
 
-    var loader = model.bind(null, function(data, pagination, error) {
+    var loader = model.bind(null, function (data, pagination, error) {
         page.loading = false;
 
         if (error) {
@@ -143,7 +143,7 @@ function templateList(page, model, config) {
  * Exported Functions
  ******************************************************************************/
 
-exports.landingPage = function(page) {
+exports.landingPage = function (page) {
     page.type = 'directory';
     page.model.contents = 'grid';
     page.metadata.title = "Trakt - Home Page";
@@ -302,7 +302,7 @@ exports.landingPage = function(page) {
 
     //log.d(page.entries);
     var processedFirstMove = false;
-    prop.subscribe(page.model.nodes, function(event, data) {
+    prop.subscribe(page.model.nodes, function (event, data) {
         if (event === "movechild" && !processedFirstMove) {
             // we only have movechilds when adding actual items
             processedFirstMove = true;
@@ -325,7 +325,7 @@ exports.landingPage = function(page) {
 };
 
 exports.calendars = {
-    myshows: function(page) {
+    myshows: function (page) {
         page.type = 'directory';
         page.model.contents = 'grid';
         page.metadata.title = "Upcoming Episodes (Next 31 days)";
@@ -338,7 +338,7 @@ exports.calendars = {
     }
 };
 
-exports.episode = function(page, show, season, episode, config) {
+exports.episode = function (page, show, season, episode, config) {
     season = parseInt(season);
     episode = parseInt(episode);
     config = config || {};
@@ -349,7 +349,7 @@ exports.episode = function(page, show, season, episode, config) {
     page.loading = 0;
 
     page.loading++;
-    model.trakt.getSeasonEpisodes(show, season, function(data, pagination) {
+    model.trakt.getSeasonEpisodes(show, season, function (data, pagination) {
         data = utils.getChild(data, 'number', episode);
         //log.d(data);
 
@@ -366,7 +366,7 @@ exports.episode = function(page, show, season, episode, config) {
         if (auth.isAuthenticated()) {
             // watch history
             page.loading++;
-            model.trakt.sync.getHistory('episodes', data.ids.trakt, function(data, pagination, error) {
+            model.trakt.sync.getHistory('episodes', data.ids.trakt, function (data, pagination, error) {
                 //log.d(data);
 
                 if (data && data.length > 0) {
@@ -377,22 +377,22 @@ exports.episode = function(page, show, season, episode, config) {
                 page.loading--;
             });
 
-            page.appendAction("Check in", function() {
+            page.appendAction("Check in", function () {
                 var postdata = {
                     episode: data
                 };
-                model.trakt.checkin(postdata, function(response, pagination, error) {
+                model.trakt.checkin(postdata, function (response, pagination, error) {
                     if (response) popup.notify("Successfully checked in", 3);
                     else if (error.statuscode === 409) popup.notify("Already checked in", 3);
                     else popup.notify("Failed to check in", 3);
                 });
             });
 
-            page.appendAction("Mark as seen", function() {
+            page.appendAction("Mark as seen", function () {
                 var postdata = {
                     episodes: [data]
                 };
-                model.trakt.sync.addToHistory(postdata, function(response, pagination, error) {
+                model.trakt.sync.addToHistory(postdata, function (response, pagination, error) {
                     if (response) {
                         popup.notify("Successfully added to history", 3);
                         page.metadata.lastSeen = new Date().toLocaleString();
@@ -405,17 +405,19 @@ exports.episode = function(page, show, season, episode, config) {
     });
 
     page.loading++;
-    model.trakt.getShowInfo(show, function(data, pagination) {
+    model.trakt.getShowInfo(show, function (data, pagination) {
         page.metadata.show.title = data.title;
         if (page.metadata.screenshot.toString() === "null")
             page.metadata.screenshot = utils.toImageSet(data.images.poster, 'poster');
-        page.metadata.background = utils.toImageSet(data.images.fanart, 'fanart');
+
+        page.metadata.background_landscape = utils.toImageSet(data.images.fanart, 'fanart');
+        page.metadata.background_portrait = utils.toImageSet(data.images.poster, 'poster');
 
         page.loading--;
     });
 
     page.loading++;
-    model.trakt.getEpisodeStats(show, season, episode, function(data, pagination) {
+    model.trakt.getEpisodeStats(show, season, episode, function (data, pagination) {
         //log.d(data);
 
         page.metadata.watchers = data.watchers;
@@ -424,13 +426,13 @@ exports.episode = function(page, show, season, episode, config) {
         page.loading--;
     });
 
-    prop.subscribe(page.metadata.imdbid, function(event, data) {
+    prop.subscribe(page.metadata.imdbid, function (event, data) {
         if (event === "set" && data !== null) {
             var imdbid = data;
             log.d("IMDB ID: " + imdbid);
 
             page.loading++;
-            model.imdb.getMovieInfo(imdbid, function(data) {
+            model.imdb.getMovieInfo(imdbid, function (data) {
                 if (data.Response === "True") {
                     //log.d(data);
                     page.metadata.director = data.Director;
@@ -448,10 +450,10 @@ exports.episode = function(page, show, season, episode, config) {
             });
         }
     }, {
-        autoDestroy: true
-    });
+            autoDestroy: true
+        });
 
-    prop.subscribe(page.metadata.show.title, function(event, data) {
+    prop.subscribe(page.metadata.show.title, function (event, data) {
         if (event === 'set' && data !== null) {
             page.appendItem("search:" + page.metadata.show.title +
                 " S" + utils.formatNumber(season, 2) +
@@ -472,7 +474,7 @@ exports.episode = function(page, show, season, episode, config) {
 
 exports.movies = {};
 
-exports.movies.anticipated = function(page) {
+exports.movies.anticipated = function (page) {
     page.type = 'directory';
     page.model.contents = 'grid';
     page.loading = true;
@@ -482,7 +484,7 @@ exports.movies.anticipated = function(page) {
     templateList(page, model.trakt.movies.anticipated.bind(null, 1, 20));
 };
 
-exports.movies.played = function(page) {
+exports.movies.played = function (page) {
     page.type = 'directory';
     page.model.contents = 'grid';
     page.loading = true;
@@ -492,7 +494,7 @@ exports.movies.played = function(page) {
     templateList(page, model.trakt.movies.played.bind(null, 1, 20));
 };
 
-exports.movies.popular = function(page) {
+exports.movies.popular = function (page) {
     page.type = 'directory';
     page.model.contents = 'grid';
     page.loading = true;
@@ -504,7 +506,7 @@ exports.movies.popular = function(page) {
     });
 };
 
-exports.movies.trending = function(page) {
+exports.movies.trending = function (page) {
     page.type = 'directory';
     page.model.contents = 'grid';
     page.loading = true;
@@ -514,7 +516,7 @@ exports.movies.trending = function(page) {
     templateList(page, model.trakt.movies.trending.bind(null, 1, 20));
 };
 
-exports.movie = function(page, id, config) {
+exports.movie = function (page, id, config) {
     config = config || {};
 
     page.type = "raw";
@@ -525,7 +527,7 @@ exports.movie = function(page, id, config) {
     var movie = null;
 
     page.loading++;
-    model.trakt.getMovieInfo(id, function(data, pagination) {
+    model.trakt.getMovieInfo(id, function (data, pagination) {
         //log.d(data);
         movie = data;
 
@@ -534,7 +536,6 @@ exports.movie = function(page, id, config) {
         page.metadata.title = data.title;
         page.metadata.poster = utils.toImageSet(data.images.poster, 'poster');
         page.metadata.logo = utils.toImageSet(data.images.logo, 'logo', false);
-        page.metadata.background = utils.toImageSet(data.images.fanart, 'fanart');
         page.metadata.year = data.year;
         page.metadata.tagline = data.tagline;
         page.metadata.description = data.overview;
@@ -543,23 +544,27 @@ exports.movie = function(page, id, config) {
         page.metadata.trakt.rating = Math.round(data.rating * 10) + "%";
         page.metadata.certification = data.certification;
 
+
+        page.metadata.background_landscape = utils.toImageSet(data.images.fanart, 'fanart');
+        page.metadata.background_portrait = utils.toImageSet(data.images.poster, 'poster');
+
         if (auth.isAuthenticated()) {
-            page.appendAction("Check in", function() {
+            page.appendAction("Check in", function () {
                 var postdata = {
                     movie: data
                 };
-                model.trakt.checkin(postdata, function(response, pagination, error) {
+                model.trakt.checkin(postdata, function (response, pagination, error) {
                     if (response) popup.notify("Successfully checked in", 3);
                     else if (error.statuscode === 409) popup.notify("Already checked in", 3);
                     else popup.notify("Failed to check in", 3);
                 });
             }).moveBefore(itemSimilar);
 
-            page.appendAction("Mark as seen", function() {
+            page.appendAction("Mark as seen", function () {
                 var postdata = {
                     movies: [data]
                 };
-                model.trakt.sync.addToHistory(postdata, function(response, pagination, error) {
+                model.trakt.sync.addToHistory(postdata, function (response, pagination, error) {
                     if (response) {
                         popup.notify("Successfully added to history", 3);
                         page.metadata.lastSeen = new Date().toLocaleString();
@@ -588,7 +593,7 @@ exports.movie = function(page, id, config) {
     if (auth.isAuthenticated()) {
         // watch history
         page.loading++;
-        model.trakt.sync.getHistory('movies', id, function(data, pagination, error) {
+        model.trakt.sync.getHistory('movies', id, function (data, pagination, error) {
             //log.d(data);
 
             if (data && data.length > 0) {
@@ -599,9 +604,9 @@ exports.movie = function(page, id, config) {
             page.loading--;
         });
 
-        prop.subscribe(page.metadata.ids.trakt, function(event, data) {
+        prop.subscribe(page.metadata.ids.trakt, function (event, data) {
             if (event === "set" && data !== null) {
-                model.trakt.sync.getWatchlist('movies', function(data, pagination, error) {
+                model.trakt.sync.getWatchlist('movies', function (data, pagination, error) {
                     if (data) {
                         var inWatchlist = false;
                         for (var i in data) {
@@ -622,11 +627,11 @@ exports.movie = function(page, id, config) {
             }
         });
 
-        prop.subscribe(page.metadata.inWatchlist, function(event, data) {
+        prop.subscribe(page.metadata.inWatchlist, function (event, data) {
             if (event === "set" && data !== null) {
                 if (data) {
                     // in watchlist
-                    var newItemManipulateWatchlist = page.appendAction('Remove from Watchlist', function(v) {
+                    var newItemManipulateWatchlist = page.appendAction('Remove from Watchlist', function (v) {
                         log.d('Removing from watchlist');
                         if (movie) {
                             var postdata = {
@@ -636,7 +641,7 @@ exports.movie = function(page, id, config) {
                                     }
                                 }]
                             };
-                            model.trakt.sync.removeFromWatchlist(postdata, function(data, pagination, error) {
+                            model.trakt.sync.removeFromWatchlist(postdata, function (data, pagination, error) {
                                 if (data) {
                                     if (data.deleted.movies > 0) {
                                         page.metadata.inWatchlist = false;
@@ -655,7 +660,7 @@ exports.movie = function(page, id, config) {
 
                 } else {
                     // not in watchlist
-                    var newItemManipulateWatchlist = page.appendAction('Add to Watchlist', function(v) {
+                    var newItemManipulateWatchlist = page.appendAction('Add to Watchlist', function (v) {
                         log.d('Adding to watchlist');
                         if (movie) {
                             var postdata = {
@@ -665,7 +670,7 @@ exports.movie = function(page, id, config) {
                                     }
                                 }]
                             };
-                            model.trakt.sync.addToWatchlist(postdata, function(data, pagination, error) {
+                            model.trakt.sync.addToWatchlist(postdata, function (data, pagination, error) {
                                 if (data) {
                                     if (data.added.movies > 0) {
                                         page.metadata.inWatchlist = true;
@@ -687,13 +692,13 @@ exports.movie = function(page, id, config) {
         });
     }
 
-    prop.subscribe(page.metadata.imdbid, function(event, data) {
+    prop.subscribe(page.metadata.imdbid, function (event, data) {
         if (event === "set" && data !== null) {
             var imdbid = data;
             log.d("IMDB ID: " + imdbid);
 
             page.loading++;
-            model.imdb.getMovieInfo(imdbid, function(data) {
+            model.imdb.getMovieInfo(imdbid, function (data) {
                 if (data.Response === "True") {
                     //log.d(data);
                     page.metadata.director = data.Director;
@@ -711,8 +716,8 @@ exports.movie = function(page, id, config) {
             });
         }
     }, {
-        autoDestroy: true
-    });
+            autoDestroy: true
+        });
 
     /*page.loading++;
     model.trakt.movies.stats(id, function(data, pagination) {
@@ -731,7 +736,7 @@ exports.movie = function(page, id, config) {
     }
 
     if (auth.isAuthenticated()) {
-        var itemManipulateWatchlist = page.appendAction('Manipulate watchlist (not available)', function(v) {
+        var itemManipulateWatchlist = page.appendAction('Manipulate watchlist (not available)', function (v) {
             popup.notify("Operation not available right now", 3);
         });
     }
@@ -742,7 +747,7 @@ exports.movie = function(page, id, config) {
     });
 };
 
-exports.movie.similar = function(page, id) {
+exports.movie.similar = function (page, id) {
     page.type = 'directory';
     page.model.contents = 'grid';
     page.metadata.title = "Trakt - Similar Movies";
@@ -755,7 +760,7 @@ exports.movie.similar = function(page, id) {
 };
 
 exports.my = {
-    watchlist: function(page, type) {
+    watchlist: function (page, type) {
         page.type = 'directory';
         page.model.contents = 'grid';
         page.loading = true;
@@ -767,14 +772,14 @@ exports.my = {
 };
 
 exports.open = {
-    list: function(page, config) {
+    list: function (page, config) {
         page.type = 'directory';
         page.metadata.title = "Choose the Movie/Episode that matches the selected item";
         page.loading = false;
 
         var title = config.title;
 
-        lookup.getItems(page, config, function(items) {
+        lookup.getItems(page, config, function (items) {
             if (items.length === 0) {
                 page.appendPassiveItem("default", null, {
                     title: "There are no potential matches"
@@ -800,13 +805,13 @@ exports.open = {
                 if (item.type === 'movie')
                     page.appendItem(PREFIX + ":movie:" + item.movie.ids.trakt + ":config:" + escape(JSON.stringify(config)),
                         'video', {
-                            title: '[MOVIE] ' + item.movie.title /* + " (score: " + item.score + ")"*/ ,
+                            title: '[MOVIE] ' + item.movie.title /* + " (score: " + item.score + ")"*/,
                             icon: utils.toImageSet(item.movie.images.poster, 'poster')
                         });
                 else if (item.type === 'show')
                     page.appendItem(PREFIX + ":show:" + item.show.ids.trakt + ":config:" + escape(JSON.stringify(config)),
                         'video', {
-                            title: '[TV SHOW] ' + item.show.title /* + " (score: " + item.score + ")"*/ ,
+                            title: '[TV SHOW] ' + item.show.title /* + " (score: " + item.score + ")"*/,
                             icon: utils.toImageSet(item.show.images.poster, 'poster')
                         });
                 else if (item.type === 'episode')
@@ -815,9 +820,9 @@ exports.open = {
                         ":config:" + escape(JSON.stringify(config)),
                         'video', {
                             title: '[TV SHOW - EPISODE] ' + item.show.title +
-                                " (Season #" + item.episode.season + ", Episode #" + item.episode.number + ")"
-                                /* + " (score: " + item.score + ")"*/
-                                ,
+                            " (Season #" + item.episode.season + ", Episode #" + item.episode.number + ")"
+                            /* + " (score: " + item.score + ")"*/
+                            ,
                             icon: utils.toImageSet(item.show.images.poster, 'poster')
                         });
             }
@@ -825,7 +830,7 @@ exports.open = {
     }
 };
 
-exports.season = function(page, show, number, config) {
+exports.season = function (page, show, number, config) {
     config = config || {};
 
     page.type = "raw";
@@ -838,7 +843,7 @@ exports.season = function(page, show, number, config) {
     var showItem = null;
 
     page.loading++;
-    model.trakt.getShowInfo(show, function(data, pagination) {
+    model.trakt.getShowInfo(show, function (data, pagination) {
         //log.d(data);
 
         showItem = data;
@@ -850,8 +855,8 @@ exports.season = function(page, show, number, config) {
         page.metadata.runtime = data.runtime + " minutes";
         page.metadata.poster = utils.toImageSet(data.images.poster, 'poster');
 
-        if (!page.metadata.background)
-            page.metadata.background = utils.toImageSet(data.images.fanart, 'fanart', true);
+        page.metadata.background_landscape = utils.toImageSet(data.images.fanart, 'fanart', false);
+        page.metadata.background_portrait = utils.toImageSet(data.images.poster, 'poster', true);
 
         /*page.appendAction('navopen', "search:" + page.metadata.title, false, {
           title: 'Search',
@@ -862,13 +867,16 @@ exports.season = function(page, show, number, config) {
     });
 
     var episodeMapping = {};
-    prop.subscribe(page.metadata.poster, function(event, data) {
+    prop.subscribe(page.metadata.poster, function (event, data) {
         if (event === "set" && data !== null) {
             page.loading++;
-            model.trakt.getSeasonsInfo(show, function(data, pagination) {
+            model.trakt.getSeasonsInfo(show, function (data, pagination) {
                 data = utils.getChild(data, 'number', number);
 
-                page.metadata.background = utils.toImageSet(data.images.thumb, 'thumb', false);
+                var tmpImageset = utils.toImageSet(data.images.thumb, 'thumb', false);
+                if (tmpImageset) {
+                    page.metadata.background_landscape = tmpImageset;
+                }
 
                 if (data.images.poster)
                     page.metadata.poster = utils.toImageSet(data.images.poster, 'poster');
@@ -884,7 +892,7 @@ exports.season = function(page, show, number, config) {
             });
 
             page.loading++;
-            model.trakt.getSeasonEpisodes(show, number, function(data, pagination) {
+            model.trakt.getSeasonEpisodes(show, number, function (data, pagination) {
                 var episodes = [];
                 for (var i in data) {
                     var item = data[i];
@@ -909,10 +917,10 @@ exports.season = function(page, show, number, config) {
     });
 
     if (auth.isAuthenticated()) {
-        prop.subscribe(page.metadata.episodesReady, function(event, data) {
+        prop.subscribe(page.metadata.episodesReady, function (event, data) {
             if (event === "set" && data !== null) {
                 page.loading++;
-                model.trakt.shows.watchedProgress(show, function(data, pagination) {
+                model.trakt.shows.watchedProgress(show, function (data, pagination) {
                     data = utils.getChild(data.seasons, 'number', number);
                     if (data) {
                         data = data.episodes;
@@ -933,13 +941,13 @@ exports.season = function(page, show, number, config) {
         });
     }
 
-    prop.subscribe(page.metadata.imdbid, function(event, data) {
+    prop.subscribe(page.metadata.imdbid, function (event, data) {
         if (event === "set" && data !== null) {
             var imdbid = data;
             log.d("IMDB ID: " + imdbid);
 
             page.loading++;
-            model.imdb.getMovieInfo(imdbid, function(data) {
+            model.imdb.getMovieInfo(imdbid, function (data) {
                 if (data.Response === "True") {
                     //log.d(data);
                     page.metadata.director = data.Director;
@@ -958,8 +966,8 @@ exports.season = function(page, show, number, config) {
             });
         }
     }, {
-        autoDestroy: true
-    });
+            autoDestroy: true
+        });
 
     /*if (config.play) {
       page.appendAction('navopen', config.play.url, false, {
@@ -970,13 +978,13 @@ exports.season = function(page, show, number, config) {
 };
 
 exports.scrobble = {
-    list: function(page, config) {
+    list: function (page, config) {
         page.type = 'directory';
         page.metadata.title = "Choose the Movie/Episode that matches what you want to watch";
         page.loading = false;
 
         config.excludeTypes = ['show'];
-        lookup.getItems(page, config, function(items) {
+        lookup.getItems(page, config, function (items) {
             if (items.length === 0) {
                 page.appendPassiveItem("default", null, {
                     title: "There are no potential matches, scrobbling for this video is not possible"
@@ -998,7 +1006,7 @@ exports.scrobble = {
                 var item = items[i];
                 if (item.type === 'movie') {
                     page.appendItem(PREFIX + ":scrobble:play:movie:" + escape(config.play.url) + ":" + item.movie.ids.trakt, 'video', {
-                        title: '[MOVIE] ' + item.movie.title /* + " (score: " + item.score + ")"*/ ,
+                        title: '[MOVIE] ' + item.movie.title /* + " (score: " + item.score + ")"*/,
                         icon: utils.toImageSet(item.movie.images.poster, 'poster')
                     });
                 } else if (item.type === 'episode')
@@ -1006,9 +1014,9 @@ exports.scrobble = {
                         item.show.ids.trakt + ":" + item.episode.season + ":" + item.episode.number,
                         'video', {
                             title: '[TV SHOW - EPISODE] ' + item.show.title +
-                                " (Season #" + item.episode.season + ", Episode #" + item.episode.number + ")"
-                                /* + " (score: " + item.score + ")"*/
-                                ,
+                            " (Season #" + item.episode.season + ", Episode #" + item.episode.number + ")"
+                            /* + " (score: " + item.score + ")"*/
+                            ,
                             icon: utils.toImageSet(item.show.images.poster, 'poster')
                         });
             }
@@ -1016,7 +1024,7 @@ exports.scrobble = {
     }
 };
 
-exports.search = function(page, query) {
+exports.search = function (page, query) {
     page.type = 'directory';
     page.model.contents = 'grid';
     page.metadata.title = "Trakt - Search";
@@ -1026,7 +1034,7 @@ exports.search = function(page, query) {
     templateList(page, model.trakt.search.textQuery.bind(null, query, null, null, 1, 20));
 };
 
-exports.show = function(page, id, config) {
+exports.show = function (page, id, config) {
     config = config || {};
 
     page.type = "raw";
@@ -1044,7 +1052,7 @@ exports.show = function(page, id, config) {
     }
 
     if (auth.isAuthenticated()) {
-        var itemManipulateWatchlist = page.appendAction('Manipulate watchlist (not available)', function(v) {
+        var itemManipulateWatchlist = page.appendAction('Manipulate watchlist (not available)', function (v) {
             popup.notify("Operation not available right now", 3);
         });
     }
@@ -1055,7 +1063,7 @@ exports.show = function(page, id, config) {
     });
 
     page.loading++;
-    model.trakt.getShowInfo(id, function(data, pagination) {
+    model.trakt.getShowInfo(id, function (data, pagination) {
         //log.d(data);
 
         show = data;
@@ -1067,7 +1075,6 @@ exports.show = function(page, id, config) {
         page.metadata.logo = utils.toImageSet(data.images.logo, 'logo', false);
         page.metadata.icon = page.metadata.logo;
         page.metadata.poster = utils.toImageSet(data.images.poster, 'poster');
-        page.metadata.background = utils.toImageSet(data.images.fanart, 'fanart');
         page.metadata.year = data.year;
         page.metadata.tagline = data.tagline;
         page.metadata.description = data.overview;
@@ -1077,6 +1084,9 @@ exports.show = function(page, id, config) {
         page.metadata.network = data.network;
         page.metadata.airedEpisodes = data.aired_episodes;
         page.metadata.status = utils.prettyStatus(data.status);
+
+        page.metadata.background_landscape = utils.toImageSet(data.images.fanart, 'fanart', true);
+        page.metadata.background_portrait = utils.toImageSet(data.images.poster, 'poster', true);
 
         if (data.trailer) {
             if (data.trailer)
@@ -1097,7 +1107,7 @@ exports.show = function(page, id, config) {
 
     if (auth.isAuthenticated()) {
         page.loading++;
-        model.trakt.shows.watchedProgress(id, function(data, pagination, error) {
+        model.trakt.shows.watchedProgress(id, function (data, pagination, error) {
             //log.d(data);
 
             if (data && data.next_episode) {
@@ -1115,9 +1125,9 @@ exports.show = function(page, id, config) {
     }
 
     if (auth.isAuthenticated()) {
-        prop.subscribe(page.metadata.ids.trakt, function(event, data) {
+        prop.subscribe(page.metadata.ids.trakt, function (event, data) {
             if (event === "set" && data !== null) {
-                model.trakt.sync.getWatchlist('shows', function(data, pagination, error) {
+                model.trakt.sync.getWatchlist('shows', function (data, pagination, error) {
                     if (data) {
                         var inWatchlist = false;
                         for (var i in data) {
@@ -1138,11 +1148,11 @@ exports.show = function(page, id, config) {
             }
         });
 
-        prop.subscribe(page.metadata.inWatchlist, function(event, data) {
+        prop.subscribe(page.metadata.inWatchlist, function (event, data) {
             if (event === "set" && data !== null) {
                 if (data) {
                     // in watchlist
-                    var newItemManipulateWatchlist = page.appendAction('Remove from Watchlist', function(v) {
+                    var newItemManipulateWatchlist = page.appendAction('Remove from Watchlist', function (v) {
                         log.d('Removing from watchlist');
                         if (show) {
                             var postdata = {
@@ -1159,7 +1169,7 @@ exports.show = function(page, id, config) {
                                     }
                                 }]
                             };
-                            model.trakt.sync.removeFromWatchlist(postdata, function(data, pagination, error) {
+                            model.trakt.sync.removeFromWatchlist(postdata, function (data, pagination, error) {
                                 if (data) {
                                     if (data.deleted.shows > 0) {
                                         page.metadata.inWatchlist = false;
@@ -1178,7 +1188,7 @@ exports.show = function(page, id, config) {
 
                 } else {
                     // not in watchlist
-                    var newItemManipulateWatchlist = page.appendAction('Add to Watchlist', function(v) {
+                    var newItemManipulateWatchlist = page.appendAction('Add to Watchlist', function (v) {
                         log.d('Adding to watchlist');
                         if (show) {
                             var postdata = {
@@ -1195,7 +1205,7 @@ exports.show = function(page, id, config) {
                                     }
                                 }]
                             };
-                            model.trakt.sync.addToWatchlist(postdata, function(data, pagination, error) {
+                            model.trakt.sync.addToWatchlist(postdata, function (data, pagination, error) {
                                 if (data) {
                                     if (data.added.shows > 0) {
                                         page.metadata.inWatchlist = true;
@@ -1217,10 +1227,10 @@ exports.show = function(page, id, config) {
         });
     }
 
-    prop.subscribe(page.metadata.poster, function(event, data) {
+    prop.subscribe(page.metadata.poster, function (event, data) {
         if (event === "set" && data !== null) {
             page.loading++;
-            model.trakt.getSeasonsInfo(id, function(data, pagination) {
+            model.trakt.getSeasonsInfo(id, function (data, pagination) {
                 utils.sortByField(data, 'number', false);
                 //log.d(data);
 
@@ -1249,13 +1259,13 @@ exports.show = function(page, id, config) {
         }
     });
 
-    prop.subscribe(page.metadata.imdbid, function(event, data) {
+    prop.subscribe(page.metadata.imdbid, function (event, data) {
         if (event === "set" && data !== null) {
             var imdbid = data;
             log.d("IMDB ID: " + imdbid);
 
             page.loading++;
-            model.imdb.getMovieInfo(imdbid, function(data) {
+            model.imdb.getMovieInfo(imdbid, function (data) {
                 if (data.Response === "True") {
                     //log.d(data);
                     page.metadata.director = data.Director;
@@ -1293,11 +1303,11 @@ exports.show = function(page, id, config) {
             });
         }
     }, {
-        autoDestroy: true
-    });
+            autoDestroy: true
+        });
 };
 
-exports.show.similar = function(page, id) {
+exports.show.similar = function (page, id) {
     page.type = 'directory';
     page.model.contents = 'grid';
     page.metadata.title = "Trakt - Similar TV Shows";
@@ -1310,7 +1320,7 @@ exports.show.similar = function(page, id) {
 };
 
 exports.shows = {
-    anticipated: function(page) {
+    anticipated: function (page) {
         page.type = 'directory';
         page.model.contents = 'grid';
         page.loading = true;
@@ -1320,7 +1330,7 @@ exports.shows = {
         templateList(page, model.trakt.shows.anticipated.bind(null, 1, 20));
     },
 
-    played: function(page) {
+    played: function (page) {
         page.type = 'directory';
         page.model.contents = 'grid';
         page.loading = true;
@@ -1330,7 +1340,7 @@ exports.shows = {
         templateList(page, model.trakt.shows.played.bind(null, 1, 20));
     },
 
-    popular: function(page) {
+    popular: function (page) {
         page.type = 'directory';
         page.model.contents = 'grid';
         page.loading = true;
@@ -1342,7 +1352,7 @@ exports.shows = {
         });
     },
 
-    trending: function(page) {
+    trending: function (page) {
         page.type = 'directory';
         page.model.contents = 'grid';
         page.loading = true;
